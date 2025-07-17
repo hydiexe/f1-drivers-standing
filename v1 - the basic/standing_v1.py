@@ -51,6 +51,38 @@ def tampilkan_klasemen():
     for i, driver in enumerate(sorted_drivers, start=1):
         print(f"{i}. {driver['nama']} | {driver['team']} | ({driver['negara']}) | Point: {driver['point']}")
 
+# fungsi untuk tambah point
+# mengembalikan total nilai point baru
+def tambah_point(driver, tambahan_point):
+    return driver["point"] + tambahan_point
+
+# ini prosedur untuk select and update point pembalap
+def update_point():
+    if not drivers:
+        print("Belum ada data pembalap")
+        return
+    
+    tampilkan_driver()
+    
+    print("\n=== PILIH PEMBALAP UNTUK DITAMBAH POIN ===")
+    for i, d in enumerate(drivers, 1):
+        print(f"{i}. {d['nama']} ({d['team']}) - {d['point']} poin")
+
+    try:
+        pilihan = int(input("Masukkan nomor pembalap: "))
+        tambahan = int(input("Tambah berapa poin?: "))
+    except ValueError:
+        print("Input tidak valid.")
+        return
+
+    if 1 <= pilihan <= len(drivers):
+        pembalap = drivers[pilihan - 1]
+        poin_baru = tambah_point(pembalap, tambahan)  # pakai fungsi
+        pembalap["point"] = poin_baru  # update poin
+        print(f"Poin {pembalap['nama']} sekarang: {poin_baru}")
+    else:
+        print("Nomor tidak valid.")
+
 # main
 def menu():
     while True:
@@ -58,9 +90,10 @@ def menu():
         print("1. Tambah Pembalap")
         print("2. Tampilkan Daftar Pembalap")
         print("3. Tampilkan Klasemen Pembalap")
-        print("4. Keluar")
+        print("4. Tambah Poin Pembalap")
+        print("5. Keluar")
 
-        pilihan = input("Pilih menu (1-4): ")
+        pilihan = input("Pilih menu (1-5): ")
 
         if pilihan == '1':
             tambah_driver()
@@ -69,6 +102,8 @@ def menu():
         elif pilihan == '3':
             tampilkan_klasemen()
         elif pilihan == '4':
+            update_point()
+        elif pilihan == '5':
             print("Terima kasih telah menggunakan program ini.")
             break
         else:
