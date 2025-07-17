@@ -51,3 +51,28 @@ def tampilkan_klasemen():
     for i, driver in enumerate(sorted_drivers, start=1):
         print(f"{i}. {driver['nama']} | {driver['team']} | ({driver['negara']}) | Point: {driver['point']}")
 
+# main
+def menu():
+    while True:
+        print("\n=== Menu ===")
+        print("1. Tambah Pembalap")
+        print("2. Tampilkan Daftar Pembalap")
+        print("3. Tampilkan Klasemen Pembalap")
+        print("4. Keluar")
+
+        pilihan = input("Pilih menu (1-4): ")
+
+        if pilihan == '1':
+            tambah_driver()
+        elif pilihan == '2':
+            tampilkan_driver()
+        elif pilihan == '3':
+            tampilkan_klasemen()
+        elif pilihan == '4':
+            print("Terima kasih telah menggunakan program ini.")
+            break
+        else:
+            print("Pilihan tidak valid, silakan coba lagi.")
+
+if __name__ == "__main__":
+    menu()
