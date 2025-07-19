@@ -31,3 +31,18 @@ class Standing:
     def tambah_poin_ke_driver(self, nama, tambahan):
         db.update_point(nama, tambahan)
         print(f"Poin untuk {nama} ditambahkan sebanyak {tambahan}.")
+
+    def get_all_drivers(self):
+        data = db.fetch_all_drivers()
+        drivers = []
+        for d in data:
+            nama, tim, negara, point, juara = d
+            if juara > 0:
+                drivers.append(ChampionDriver(nama, tim, negara, point, juara))
+            else:
+                drivers.append(Driver(nama, tim, negara, point))
+        return drivers
+
+    def get_klasemen(self):
+        all_drivers = self.get_all_drivers()
+        return sorted(all_drivers, key=lambda d: d.point, reverse=True)

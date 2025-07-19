@@ -3,130 +3,149 @@ from tkinter import messagebox, Toplevel, StringVar, OptionMenu
 from standing import Standing
 from models.driver import Driver, ChampionDriver
 
-# Inisialisasi objek Standing yang otomatis membuat database
 standing = Standing()
 
-# Prosedur untuk menambah pembalap biasa
-def tambah_biasa():
-    nama = entry_nama.get()
-    tim = entry_tim.get()
-    negara = entry_negara.get()
+def menu_tambah_biasa():
+    top = Toplevel(root)
+    top.title("Tambah Pembalap Biasa")
 
-    if not nama or not tim or not negara:
-        messagebox.showwarning("Peringatan", "Semua kolom wajib diisi.")
-        return
+    Label(top, text="Nama").pack()
+    entry_nama = Entry(top)
+    entry_nama.pack()
 
-    driver = Driver(nama, tim, negara)
-    standing.tambah_driver(driver)
-    messagebox.showinfo("Sukses", f"Pembalap {nama} berhasil ditambahkan.")
+    Label(top, text="Tim").pack()
+    entry_tim = Entry(top)
+    entry_tim.pack()
 
-# Prosedur untuk menambah pembalap juara dunia (OOP: inheritance)
-def tambah_juara():
-    nama = entry_nama.get()
-    tim = entry_tim.get()
-    negara = entry_negara.get()
+    Label(top, text="Negara").pack()
+    entry_negara = Entry(top)
+    entry_negara.pack()
 
-    try:
-        juara = int(entry_juara.get())
-    except ValueError:
-        messagebox.showerror("Error", "Jumlah juara harus berupa angka.")
-        return
+    def simpan():
+        nama = entry_nama.get()
+        tim = entry_tim.get()
+        negara = entry_negara.get()
+        if not nama or not tim or not negara:
+            messagebox.showwarning("Lengkapi semua data", parent=top)
+            return
+        standing.tambah_driver(Driver(nama, tim, negara))
+        messagebox.showinfo("Sukses", f"{nama} ditambahkan", parent=top)
+        top.destroy()
 
-    if not nama or not tim or not negara:
-        messagebox.showwarning("Peringatan", "Semua kolom wajib diisi.")
-        return
+    Button(top, text="Simpan", command=simpan).pack(pady=5)
+    Button(top, text="Batal", command=top.destroy).pack()
 
-    driver = ChampionDriver(nama, tim, negara, jumlah_juara=juara)
-    standing.tambah_driver(driver)
-    messagebox.showinfo("Sukses", f"Juara dunia {nama} berhasil ditambahkan.")
+def menu_tambah_juara():
+    top = Toplevel(root)
+    top.title("Tambah Juara Dunia")
 
-# Menampilkan semua data pembalap (OOP + database)
-def tampilkan_semua():
+    Label(top, text="Nama").pack()
+    entry_nama = Entry(top)
+    entry_nama.pack()
+
+    Label(top, text="Tim").pack()
+    entry_tim = Entry(top)
+    entry_tim.pack()
+
+    Label(top, text="Negara").pack()
+    entry_negara = Entry(top)
+    entry_negara.pack()
+
+    Label(top, text="Jumlah Juara Dunia").pack()
+    entry_juara = Entry(top)
+    entry_juara.pack()
+
+    def simpan():
+        try:
+            nama = entry_nama.get()
+            tim = entry_tim.get()
+            negara = entry_negara.get()
+            juara = int(entry_juara.get())
+            if not nama or not tim or not negara:
+                raise ValueError
+            driver = ChampionDriver(nama, tim, negara, jumlah_juara=juara)
+            standing.tambah_driver(driver)
+            messagebox.showinfo("Sukses", f"{nama} (Juara {juara}x) ditambahkan", parent=top)
+            top.destroy()
+        except:
+            messagebox.showerror("Gagal", "Isi data dengan benar", parent=top)
+
+    Button(top, text="Simpan", command=simpan).pack(pady=5)
+    Button(top, text="Batal", command=top.destroy).pack()
+
+def menu_tampilkan_semua():
     daftar = standing.get_all_drivers()
     if not daftar:
-        messagebox.showinfo("Info", "Belum ada data pembalap.")
+        messagebox.showinfo("Info", "Belum ada pembalap.")
         return
 
     top = Toplevel(root)
     top.title("Daftar Pembalap")
-    for i, d in enumerate(daftar, 1):
-        info = f"{i}. {d[1]} | {d[2]} | ({d[3]}) | Poin: {d[4]} | Juara: {d[5]}"
-        Label(top, text=info).pack(anchor="w")
 
-# Menampilkan klasemen urut berdasarkan point
-def tampilkan_klasemen():
+    for i, d in enumerate(daftar, 1):
+        text = f"{i}. {d.nama} | {d.tim} | ({d.negara}) | Poin: {d.point}"
+        if isinstance(d, ChampionDriver):
+            text += f" | Juara: {d.jumlah_juara}"
+        Label(top, text=text).pack(anchor="w")
+
+def menu_tampilkan_klasemen():
     daftar = standing.get_klasemen()
     if not daftar:
-        messagebox.showinfo("Info", "Belum ada data pembalap.")
+        messagebox.showinfo("Info", "Belum ada data.")
         return
 
     top = Toplevel(root)
     top.title("Klasemen Pembalap")
-    for i, d in enumerate(daftar, 1):
-        info = f"{i}. {d[1]} | {d[2]} | ({d[3]}) | Poin: {d[4]}"
-        Label(top, text=info).pack(anchor="w")
 
-# Tambah poin ke pembalap tertentu
-def tambah_point_gui():
+    for i, d in enumerate(daftar, 1):
+        text = f"{i}. {d.nama} | {d.tim} | ({d.negara}) | Poin: {d.point}"
+        Label(top, text=text).pack(anchor="w")
+
+def menu_tambah_poin():
     daftar = standing.get_all_drivers()
     if not daftar:
-        messagebox.showinfo("Info", "Belum ada data pembalap.")
+        messagebox.showinfo("Info", "Belum ada data.")
         return
 
     top = Toplevel(root)
-    top.title("Tambah Poin Pembalap")
+    top.title("Tambah Poin")
 
     pilihan = StringVar(top)
-    pilihan.set(daftar[0][1])  # default pilih nama pertama
-
-    nama_to_id = {d[1]: d[0] for d in daftar}
+    pilihan.set(daftar[0].nama)
+    nama_to_driver = {d.nama: d for d in daftar}
 
     Label(top, text="Pilih Pembalap").pack()
-    drop = OptionMenu(top, pilihan, *nama_to_id.keys())
-    drop.pack()
+    OptionMenu(top, pilihan, *nama_to_driver.keys()).pack()
 
-    Label(top, text="Jumlah Poin Tambahan").pack()
+    Label(top, text="Tambahan Poin").pack()
     entry_poin = Entry(top)
     entry_poin.pack()
 
     def simpan():
         try:
             tambahan = int(entry_poin.get())
-            id_driver = nama_to_id[pilihan.get()]
-            standing.tambah_point(id_driver, tambahan)
-            messagebox.showinfo("Sukses", "Poin berhasil ditambahkan.")
+            driver_obj = nama_to_driver[pilihan.get()]
+            standing.tambah_poin_ke_driver(driver_obj.nama, tambahan)
+            messagebox.showinfo("Sukses", f"{driver_obj.nama} mendapat {tambahan} poin", parent=top)
             top.destroy()
-        except ValueError:
-            messagebox.showerror("Error", "Masukkan angka yang valid.")
+        except:
+            messagebox.showerror("Error", "Masukkan angka yang valid", parent=top)
 
     Button(top, text="Simpan", command=simpan).pack(pady=5)
+    Button(top, text="Batal", command=top.destroy).pack()
 
-# === GUI START ===
 root = Tk()
-root.title("F1 Driver Standings GUI")
-root.geometry("400x400")
+root.title("F1 Driver Standings")
+root.geometry("350x350")
 
-Label(root, text="Nama").pack()
-entry_nama = Entry(root)
-entry_nama.pack()
+Label(root, text="MENU UTAMA", font=("Helvetica", 14, "bold")).pack(pady=10)
 
-Label(root, text="Tim").pack()
-entry_tim = Entry(root)
-entry_tim.pack()
+Button(root, text="Menu Tambah Pembalap", command=menu_tambah_biasa).pack(fill="x", padx=30, pady=3)
+Button(root, text="Menu Tambah Juara Dunia", command=menu_tambah_juara).pack(fill="x", padx=30, pady=3)
+Button(root, text="Menu Tampilkan Pembalap", command=menu_tampilkan_semua).pack(fill="x", padx=30, pady=3)
+Button(root, text="Menu Tampilkan Klasemen", command=menu_tampilkan_klasemen).pack(fill="x", padx=30, pady=3)
+Button(root, text="Menu Tambah Poin", command=menu_tambah_poin).pack(fill="x", padx=30, pady=3)
 
-Label(root, text="Negara").pack()
-entry_negara = Entry(root)
-entry_negara.pack()
-
-Label(root, text="Jumlah Juara Dunia (Opsional)").pack()
-entry_juara = Entry(root)
-entry_juara.pack()
-
-Button(root, text="Tambah Pembalap Biasa", command=tambah_biasa).pack(pady=4)
-Button(root, text="Tambah Juara Dunia", command=tambah_juara).pack(pady=4)
-Button(root, text="Tampilkan Semua Pembalap", command=tampilkan_semua).pack(pady=4)
-Button(root, text="Tampilkan Klasemen", command=tampilkan_klasemen).pack(pady=4)
-Button(root, text="Tambah Poin ke Pembalap", command=tambah_point_gui).pack(pady=4)
-Button(root, text="Keluar", command=root.quit).pack(pady=10)
+Button(root, text="Keluar", command=root.quit).pack(fill="x", padx=30, pady=10)
 
 root.mainloop()

@@ -11,7 +11,7 @@ class Driver(DriverBase):
     def tampil_info(self):
         print(f"{self.nama} | {self.tim} | ({self.negara}) | Poin: {self.point}")
 
-    def tambah_poin(self, tambahan=1):
+    def tambah_point(self, tambahan=1):
         self.point += tambahan
 
 # Kelas turunan ChampionDriver (OVERRIDING)
